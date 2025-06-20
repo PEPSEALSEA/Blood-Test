@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เกมทดสอบหมู่เลือด</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,7 +14,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Mali', sans-serif;
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             min-height: 100vh;
             color: #ecf0f1;
@@ -242,12 +243,14 @@
             overflow: hidden;
             display: none;
             transform: scale(1);
-            transition: transform 0.5s ease;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
         }
 
         .mixing-container.show {
             display: block;
             transform: scale(1.1);
+            opacity: 1;
         }
 
         .mixing-top {
@@ -295,7 +298,6 @@
         .pour-stream {
             position: absolute;
             width: 10px;
-            height: 0;
             background: linear-gradient(to bottom, transparent, #e74c3c);
             transition: height 1s ease, opacity 0.5s ease;
             opacity: 0;
@@ -434,9 +436,7 @@
         }
 
         @keyframes shake {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateX(0);
             }
 
@@ -837,6 +837,8 @@
             resultDisplay.classList.remove('show', 'compatible-result', 'incompatible-result');
             resultDisplay.innerHTML = '';
             animationContainer.classList.remove('show');
+            mixingContainer.classList.remove('show');
+            mixingContainer.style.opacity = '0';
             mixingContainer.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
         }
 
@@ -855,16 +857,17 @@
 
             setTimeout(() => {
                 animationContainer.classList.add('show');
+                mixingContainer.classList.add('show');
+                mixingContainer.style.opacity = '1';
                 document.getElementById('donorLiquid').style.height = '140px';
                 document.getElementById('recipientLiquid').style.height = '140px';
             }, 500);
 
             setTimeout(() => {
-                mixingContainer.classList.add('show');
                 document.getElementById('donorStream').classList.add('active');
                 document.getElementById('recipientStream').classList.add('active');
                 createBubbles(mixingContainer, 5);
-            }, 2000);
+            }, 1500);
 
             setTimeout(() => {
                 document.getElementById('donorStream').classList.remove('active');
@@ -874,7 +877,7 @@
                 mixedBlood.classList.add(isCompatible ? 'compatible-mix' : 'incompatible-mix');
                 mixedBlood.style.height = '180px';
                 createBubbles(mixingContainer, 3);
-            }, 3500);
+            }, 3000);
 
             setTimeout(() => {
                 const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
@@ -882,14 +885,14 @@
                     mixingContainer.classList.add('shake');
                     createBubbles(mixingContainer, 5);
                 }
-            }, 5000);
+            }, 4500);
 
             setTimeout(() => {
                 if (!compatibility[selectedDonor].includes(selectedRecipient)) {
                     document.getElementById('precipitate').classList.add('show');
                     mixingContainer.classList.remove('shake');
                 }
-            }, 6500);
+            }, 6000);
 
             setTimeout(() => {
                 const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
@@ -903,7 +906,7 @@
                 `;
                 isTesting = false;
                 checkTestReady();
-            }, 8000);
+            }, 7500);
         }
     </script>
 </body>
