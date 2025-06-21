@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกม - ทดสอบหมู่เลือด</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Mali', sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #ecf0f1;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .header-nav {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-item a {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-family: 'Mali', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .nav-item a:hover {
+            color: #f39c12;
+            transform: translateY(-2px);
+        }
+
+        .nav-item a.active {
+            color: #e74c3c;
+            border-bottom: 2px solid #e74c3c;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: #e74c3c;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #bdc3c7;
+            font-weight: 400;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #f39c12;
+            font-weight: 600;
+        }
+
+        .selection-container {
+            margin-bottom: 20px;
+        }
+
+        .blood-type-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .blood-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ecf0f1;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .blood-option:hover {
+            transform: translateY(-2px);
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.15);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+        }
+
+        .blood-option.selected {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .test-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .selected-types {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        .selected-display {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 100px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .donor-display {
+            border-color: #3498db;
+            background: rgba(52, 152, 219, 0.15);
+        }
+
+        .recipient-display {
+            border-color: #9b59b6;
+            background: rgba(155, 89, 182, 0.15);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: #f39c12;
+            font-weight: bold;
+            transform: rotate(90deg);
+        }
+
+        .test-button {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 12px 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .test-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .test-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .animation-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+
+        .animation-container.show {
+            display: flex;
+        }
+
+        .test-tubes-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+        }
+
+        .test-tube {
+            width: 50px;
+            height: 180px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #bdc3c7;
+            border-radius: 0 0 25px 25px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .test-tube-top {
+            width: 60px;
+            height: 18px;
+            background: #95a5a6;
+            margin-left: -5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+        }
+
+        .blood-liquid {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            transition: height 1.2s ease-in-out, opacity 0.5s ease;
+            border-radius: 0 0 22px 22px;
+        }
+
+        .donor-blood {
+            background: linear-gradient(to top, #c62d42, #e74c3c);
+            height: 0;
+        }
+
+        .recipient-blood {
+            background: linear-gradient(to top, #8e44ad, #9b59b6);
+            height: 0;
+        }
+
+        .mixing-container {
+            width: 100px;
+            height: 220px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #bdc3c7;
+            border-radius: 0 0 30px 30px;
+            overflow: hidden;
+            display: none;
+            transform: scale(1);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .mixing-container.show {
+            display: block;
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .mixing-top {
+            width: 110px;
+            height: 22px;
+            background: #95a5a6;
+            margin-left: -5px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+        }
+
+        .mixed-blood {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0;
+            border-radius: 0 0 27px 27px;
+            transition: height 1.5s ease-in-out, background 0.5s ease;
+        }
+
+        .compatible-mix {
+            background: linear-gradient(to top, #7d3c98, #a569bd, #e74c3c);
+        }
+
+        .incompatible-mix {
+            background: linear-gradient(to top, #4a4a4a, #7f8c8d, #e74c3c);
+        }
+
+        .precipitate {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0;
+            background: #2c3e50;
+            border-radius: 0 0 27px 27px;
+            transition: height 2s ease-in-out, opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .precipitate.show {
+            opacity: 1;
+            height: 40px;
+        }
+
+        .pour-stream {
+            position: absolute;
+            width: 10px;
+            background: linear-gradient(to bottom, transparent, #e74c3c);
+            transition: height 1s ease, opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .donor-stream {
+            left: 10px;
+            top: 180px;
+            background: linear-gradient(to bottom, transparent, #e74c3c);
+        }
+
+        .recipient-stream {
+            right: 10px;
+            top: 180px;
+            background: linear-gradient(to bottom, transparent, #9b59b6);
+        }
+
+        .pour-stream.active {
+            height: 80px;
+            opacity: 1;
+        }
+
+        .result-display {
+            margin-top: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            min-height: 100px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.5s ease;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .result-display.show {
+            display: flex;
+            animation: resultPop 0.6s ease-out;
+        }
+
+        .compatible-result {
+            background: rgba(46, 204, 113, 0.25);
+            border: 2px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .incompatible-result {
+            background: rgba(231, 76, 60, 0.25);
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .compatibility-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.8rem;
+        }
+
+        .compatibility-table th,
+        .compatibility-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-weight: 500;
+        }
+
+        .compatibility-table th {
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+            font-weight: 600;
+        }
+
+        .compatible-cell {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+            font-weight: 600;
+        }
+
+        .incompatible-cell {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes resultPop {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        @keyframes bubble {
+            0% {
+                transform: translateY(0);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .bubble {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: bubble 1.5s ease-in-out forwards;
+        }
+
+        @media (min-width: 769px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .game-container {
+                padding: 30px;
+            }
+
+            .blood-type-selector {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+
+            .blood-option {
+                padding: 15px 10px;
+                font-size: 1.1rem;
+                min-height: 60px;
+            }
+
+            .selected-types {
+                flex-direction: row;
+                gap: 20px;
+            }
+
+            .selected-display {
+                padding: 20px;
+                min-width: 120px;
+                font-size: 1.2rem;
+            }
+
+            .arrow {
+                transform: none;
+                font-size: 2rem;
+            }
+
+            .test-button {
+                font-size: 1.2rem;
+                padding: 15px 40px;
+            }
+
+            .test-tubes-container {
+                gap: 40px;
+            }
+
+            .test-tube {
+                width: 60px;
+                height: 200px;
+            }
+
+            .mixing-container {
+                width: 120px;
+                height: 250px;
+            }
+
+            .compatibility-table {
+                font-size: 0.9rem;
+            }
+
+            .compatibility-table th,
+            .compatibility-table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                gap: 15px;
+            }
+
+            .nav-item a {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header-nav">
+            <nav class="nav-container">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/index.html">หน้าหลัก</a></li>
+                    <li class="nav-item"><a href="/game.html" class="active">เกม</a></li>
+                    <li class="nav-item"><a href="/info.html">ความรู้</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div class="header">
+            <h1>🩸 เกมทดสอบหมู่เลือด</h1>
+        </div>
+
+        <div class="game-container">
+            <div class="selection-container">
+                <h2 class="section-title">เลือกหมู่เลือดผู้บริจาค</h2>
+                <div class="blood-type-selector" id="donorSelector">
+                    <div class="blood-option" data-type="O-">O-</div>
+                    <div class="blood-option" data-type="O+">O+</div>
+                    <div class="blood-option" data-type="A-">A-</div>
+                    <div class="blood-option" data-type="A+">A+</div>
+                    <div class="blood-option" data-type="B-">B-</div>
+                    <div class="blood-option" data-type="B+">B+</div>
+                    <div class="blood-option" data-type="AB-">AB-</div>
+                    <div class="blood-option" data-type="AB+">AB+</div>
+                </div>
+            </div>
+
+            <div class="selection-container">
+                <h2 class="section-title">เลือกหมู่เลือดผู้รับ</h2>
+                <div class="blood-type-selector" id="recipientSelector">
+                    <div class="blood-option" data-type="O-">O-</div>
+                    <div class="blood-option" data-type="O+">O+</div>
+                    <div class="blood-option" data-type="A-">A-</div>
+                    <div class="blood-option" data-type="A+">A+</div>
+                    <div class="blood-option" data-type="B-">B-</div>
+                    <div class="blood-option" data-type="B+">B+</div>
+                    <div class="blood-option" data-type="AB-">AB-</div>
+                    <div class="blood-option" data-type="AB+">AB+</div>
+                </div>
+            </div>
+
+            <div class="test-section">
+                <div class="selected-types">
+                    <div class="selected-display donor-display" id="donorDisplay">
+                        เลือกผู้บริจาค
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="selected-display recipient-display" id="recipientDisplay">
+                        เลือกผู้รับ
+                    </div>
+                </div>
+
+                <button class="test-button" id="testButton" disabled>
+                    เลือกหมู่เลือดทั้งสองก่อน
+                </button>
+
+                <div class="animation-container" id="animationContainer">
+                    <div class="test-tubes-container">
+                        <div>
+                            <div class="test-tube-top"></div>
+                            <div class="test-tube">
+                                <div class="blood-liquid donor-blood" id="donorLiquid"></div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: #bdc3c7;">ผู้บริจาค</div>
+                        </div>
+
+                        <div>
+                            <div class="mixing-top"></div>
+                            <div class="mixing-container" id="mixingContainer">
+                                <div class="mixed-blood" id="mixedBlood"></div>
+                                <div class="precipitate" id="precipitate"></div>
+                                <div class="pour-stream donor-stream" id="donorStream"></div>
+                                <div class="pour-stream recipient-stream" id="recipientStream"></div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: #bdc3c7;">การทดสอบ</div>
+                        </div>
+
+                        <div>
+                            <div class="test-tube-top"></div>
+                            <div class="test-tube">
+                                <div class="blood-liquid recipient-blood" id="recipientLiquid"></div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.9rem; color: #bdc3c7;">ผู้รับ</div>
+                        </div>
+                    </div>
+                    <div class="result-display" id="resultDisplay"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="info-panel">
+            <h2 class="section-title">ตารางความเข้ากันได้ของหมู่เลือด</h2>
+            <table class="compatibility-table">
+                <thead>
+                    <tr>
+                        <th>บริจาค→<br>รับ↓</th>
+                        <th>O-</th>
+                        <th>O+</th>
+                        <th>A-</th>
+                        <th>A+</th>
+                        <th>B-</th>
+                        <th>B+</th>
+                        <th>AB-</th>
+                        <th>AB+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>O-</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>O+</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>A-</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>A+</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>B-</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>B+</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>AB-</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="incompatible-cell">✗</td>
+                    </tr>
+                    <tr>
+                        <th>AB+</th>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                        <td class="compatible-cell">✓</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> -->
+    </div>
+
+    <script>
+        let selectedDonor = null;
+        let selectedRecipient = null;
+        let isTesting = false;
+        let testTimeouts = [];
+
+        const compatibility = {
+            'O-': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
+            'O+': ['O+', 'A+', 'B+', 'AB+'],
+            'A-': ['A-', 'A+', 'AB-', 'AB+'],
+            'A+': ['A+', 'AB+'],
+            'B-': ['B-', 'B+', 'AB-', 'AB+'],
+            'B+': ['B+', 'AB+'],
+            'AB-': ['AB-', 'AB+'],
+            'AB+': ['AB+']
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeSelectors();
+            document.getElementById('testButton').addEventListener('click', performTest);
+        });
+
+        function initializeSelectors() {
+            const donorOptions = document.querySelectorAll('#donorSelector .blood-option');
+            const recipientOptions = document.querySelectorAll('#recipientSelector .blood-option');
+
+            donorOptions.forEach(option => {
+                option.addEventListener('click', () => selectDonor(option));
+            });
+
+            recipientOptions.forEach(option => {
+                option.addEventListener('click', () => selectRecipient(option));
+            });
+        }
+
+        function selectDonor(option) {
+            if (isTesting) {
+                cancelTest();
+            }
+            document.querySelectorAll('#donorSelector .blood-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            selectedDonor = option.dataset.type;
+            document.getElementById('donorDisplay').textContent = `ผู้บริจาค: ${selectedDonor}`;
+            checkTestReady();
+        }
+
+        function selectRecipient(option) {
+            if (isTesting) {
+                cancelTest();
+            }
+            document.querySelectorAll('#recipientSelector .blood-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            selectedRecipient = option.dataset.type;
+            document.getElementById('recipientDisplay').textContent = `ผู้รับ: ${selectedRecipient}`;
+            checkTestReady();
+        }
+
+        function checkTestReady() {
+            const testButton = document.getElementById('testButton');
+            if (selectedDonor && selectedRecipient && !isTesting) {
+                testButton.disabled = false;
+                testButton.textContent = 'ทดสอบความเข้ากันได้';
+            } else {
+                testButton.disabled = true;
+                testButton.textContent = isTesting ? 'กำลังทดสอบ...' : 'เลือกหมู่เลือดทั้งสองก่อน';
+            }
+        }
+
+        function createBubbles(container, count) {
+            for (let i = 0; i < count; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                bubble.style.left = `${Math.random() * 80 + 10}%`;
+                bubble.style.animationDelay = `${Math.random() * 0.5}s`;
+                container.appendChild(bubble);
+                setTimeout(() => bubble.remove(), 1500);
+            }
+        }
+
+        function resetAnimation() {
+            const donorLiquid = document.getElementById('donorLiquid');
+            const recipientLiquid = document.getElementById('recipientLiquid');
+            const mixingContainer = document.getElementById('mixingContainer');
+            const mixedBlood = document.getElementById('mixedBlood');
+            const precipitate = document.getElementById('precipitate');
+            const donorStream = document.getElementById('donorStream');
+            const recipientStream = document.getElementById('recipientStream');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const animationContainer = document.getElementById('animationContainer');
+
+            donorLiquid.style.height = '0';
+            recipientLiquid.style.height = '0';
+            mixingContainer.classList.remove('show', 'shake');
+            mixedBlood.style.height = '0';
+            mixedBlood.classList.remove('compatible-mix', 'incompatible-mix');
+            precipitate.classList.remove('show');
+            donorStream.classList.remove('active');
+            recipientStream.classList.remove('active');
+            resultDisplay.classList.remove('show', 'compatible-result', 'incompatible-result');
+            resultDisplay.innerHTML = '';
+            animationContainer.classList.remove('show');
+            mixingContainer.classList.remove('show');
+            mixingContainer.style.opacity = '0';
+            mixingContainer.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
+        }
+
+        function cancelTest() {
+            testTimeouts.forEach(timeout => clearTimeout(timeout));
+            testTimeouts = [];
+            isTesting = false;
+            resetAnimation();
+            checkTestReady();
+        }
+
+        function performTest() {
+            if (!selectedDonor || !selectedRecipient || isTesting) return;
+
+            isTesting = true;
+            const testButton = document.getElementById('testButton');
+            const resultDisplay = document.getElementById('resultDisplay');
+            const animationContainer = document.getElementById('animationContainer');
+            const mixingContainer = document.getElementById('mixingContainer');
+
+            testButton.disabled = true;
+            testButton.textContent = 'กำลังทดสอบ...';
+            resetAnimation();
+
+            testTimeouts.push(setTimeout(() => {
+                animationContainer.classList.add('show');
+                mixingContainer.classList.add('show');
+                mixingContainer.style.opacity = '1';
+                document.getElementById('donorLiquid').style.height = '140px';
+                document.getElementById('recipientLiquid').style.height = '140px';
+            }, 500));
+
+            testTimeouts.push(setTimeout(() => {
+                document.getElementById('donorStream').classList.add('active');
+                document.getElementById('recipientStream').classList.add('active');
+                createBubbles(mixingContainer, 5);
+            }, 1500));
+
+            testTimeouts.push(setTimeout(() => {
+                document.getElementById('donorStream').classList.remove('active');
+                document.getElementById('recipientStream').classList.remove('active');
+                const mixedBlood = document.getElementById('mixedBlood');
+                const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
+                mixedBlood.classList.add(isCompatible ? 'compatible-mix' : 'incompatible-mix');
+                mixedBlood.style.height = '180px';
+                createBubbles(mixingContainer, 3);
+            }, 3000));
+
+            testTimeouts.push(setTimeout(() => {
+                const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
+                if (!isCompatible) {
+                    mixingContainer.classList.add('shake');
+                    createBubbles(mixingContainer, 5);
+                }
+            }, 4500));
+
+            testTimeouts.push(setTimeout(() => {
+                if (!compatibility[selectedDonor].includes(selectedRecipient)) {
+                    document.getElementById('precipitate').classList.add('show');
+                    mixingContainer.classList.remove('shake');
+                }
+            }, 6000));
+
+            testTimeouts.push(setTimeout(() => {
+                const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
+                resultDisplay.classList.add('show', isCompatible ? 'compatible-result' : 'incompatible-result');
+                resultDisplay.innerHTML = `
+                    <div>
+                        <strong>${isCompatible ? '✅ เข้ากันได้!' : '❌ เข้ากันไม่ได้!'}</strong><br>
+                        เลือด ${selectedDonor} → ${selectedRecipient}<br>
+                        <small>${isCompatible ? 'ปลอดภัย ไม่เกิดการตกตะกอน' : 'ไม่ปลอดภัย เกิดการตกตะกอน'}</small>
+                    </div>
+                `;
+                isTesting = false;
+                checkTestReady();
+            }, 7500));
+        }
+    </script>
+</body>
+
+</html>
