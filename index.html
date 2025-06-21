@@ -743,6 +743,7 @@
         let selectedDonor = null;
         let selectedRecipient = null;
         let isTesting = false;
+        let testTimeouts = [];
 
         const compatibility = {
             'O-': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+'],
@@ -774,6 +775,9 @@
         }
 
         function selectDonor(option) {
+            if (isTesting) {
+                cancelTest();
+            }
             document.querySelectorAll('#donorSelector .blood-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
@@ -784,6 +788,9 @@
         }
 
         function selectRecipient(option) {
+            if (isTesting) {
+                cancelTest();
+            }
             document.querySelectorAll('#recipientSelector .blood-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
@@ -842,6 +849,14 @@
             mixingContainer.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
         }
 
+        function cancelTest() {
+            testTimeouts.forEach(timeout => clearTimeout(timeout));
+            testTimeouts = [];
+            isTesting = false;
+            resetAnimation();
+            checkTestReady();
+        }
+
         function performTest() {
             if (!selectedDonor || !selectedRecipient || isTesting) return;
 
@@ -855,21 +870,21 @@
             testButton.textContent = 'กำลังทดสอบ...';
             resetAnimation();
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 animationContainer.classList.add('show');
                 mixingContainer.classList.add('show');
                 mixingContainer.style.opacity = '1';
                 document.getElementById('donorLiquid').style.height = '140px';
                 document.getElementById('recipientLiquid').style.height = '140px';
-            }, 500);
+            }, 500));
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 document.getElementById('donorStream').classList.add('active');
                 document.getElementById('recipientStream').classList.add('active');
                 createBubbles(mixingContainer, 5);
-            }, 1500);
+            }, 1500));
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 document.getElementById('donorStream').classList.remove('active');
                 document.getElementById('recipientStream').classList.remove('active');
                 const mixedBlood = document.getElementById('mixedBlood');
@@ -877,36 +892,36 @@
                 mixedBlood.classList.add(isCompatible ? 'compatible-mix' : 'incompatible-mix');
                 mixedBlood.style.height = '180px';
                 createBubbles(mixingContainer, 3);
-            }, 3000);
+            }, 3000));
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
                 if (!isCompatible) {
                     mixingContainer.classList.add('shake');
                     createBubbles(mixingContainer, 5);
                 }
-            }, 4500);
+            }, 4500));
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 if (!compatibility[selectedDonor].includes(selectedRecipient)) {
                     document.getElementById('precipitate').classList.add('show');
                     mixingContainer.classList.remove('shake');
                 }
-            }, 6000);
+            }, 6000));
 
-            setTimeout(() => {
+            testTimeouts.push(setTimeout(() => {
                 const isCompatible = compatibility[selectedDonor].includes(selectedRecipient);
                 resultDisplay.classList.add('show', isCompatible ? 'compatible-result' : 'incompatible-result');
                 resultDisplay.innerHTML = `
                     <div>
-                        <strong>${isCompatible ? '✅ เข้ากันได้!' : '❌ ไม่เข้ากันได้!'}</strong><br>
+                        <strong>${isCompatible ? '✅ เข้ากันได้!' : '❌ เข้ากันไม่ได้!'}</strong><br>
                         เลือด ${selectedDonor} → ${selectedRecipient}<br>
                         <small>${isCompatible ? 'ปลอดภัย ไม่เกิดการตกตะกอน' : 'ไม่ปลอดภัย เกิดการตกตะกอน'}</small>
                     </div>
                 `;
                 isTesting = false;
                 checkTestReady();
-            }, 7500);
+            }, 7500));
         }
     </script>
 </body>
